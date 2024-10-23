@@ -10,30 +10,27 @@ const BirthdayPage = () => {
         },
         confetti: false,
         images: {
-            first: {
-                show: false,
-                fade: "opacity-0",
-                visible: false
-            },
-            second: {
-                show: false,
-                fade: "opacity-0"
-            }
+            first: { show: false, fade: "opacity-0", visible: false },
+            second: { show: false, fade: "opacity-0" },
+            third: { show: false, fade: "opacity-0" },
+            fourth: { show: false, fade: "opacity-0" }
         },
         message: "",
         showTyping: false,
-        typedText: ""
+        typedText: "",
+        audio: null
     });
 
     const finalMessage = "ನಗು, ಸಂತೋಷ ಮತ್ತು ನಿಮ್ಮನ್ನು ನಗಿಸುವ ಎಲ್ಲಾ ವಿಷಯಗಳಿಂದ ತುಂಬಿದ ದಿನವನ್ನು ನಾನು ಬಯಸುತ್ತೇನೆ! ಈ ವರ್ಷ ನಿಮಗೆ ಹೊಸ ಸಾಹಸಗಳು, ಅದ್ಭುತ ನೆನಪುಗಳು ಮತ್ತು ಅಂತ್ಯವಿಲ್ಲದ ಸಂತೋಷವನ್ನು ತರಲಿ. ದೊಡ್ಡದಾಗಿ ಆಚರಿಸಿ-ನೀವು ಅದಕ್ಕೆ ಅರ್ಹರು!";
 
-    useEffect(() => {
-        setTimeout(() => {
-            setCurrentState(prev => ({
-                ...prev,
-                mainText: { ...prev.mainText, fade: "opacity-100" }
-            }));
-        }, 100);
+    const initializeAudio = useCallback(() => {
+        const audio = new Audio('sunshine.mp3');
+        audio.volume = 0.2;
+        audio.loop = true;
+        audio.play().catch(error => {
+            console.log('Audio playback failed:', error);
+        });
+        return audio;
     }, []);
 
     const typeWriter = useCallback(() => {
@@ -53,25 +50,54 @@ const BirthdayPage = () => {
     }, [finalMessage]);
 
     useEffect(() => {
-        const audio = new Audio('sunshine.mp3');
-        audio.volume = 0.2;
-        audio.loop = true;
-        audio.play().catch(() => {
-            document.addEventListener('click', () => {
-                audio.play();
-            }, { once: true });
-        });
+        const audio = initializeAudio();
+        setCurrentState(prev => ({ ...prev, audio }));
 
         const sequence = [
+            // Initial fade in
             {
-                timing: 5000,
+                timing: 100,
+                action: () => setCurrentState(prev => ({
+                    ...prev,
+                    mainText: { ...prev.mainText, fade: "opacity-100" }
+                }))
+            },
+            // First transition
+            {
+                timing: 4000,
                 action: () => setCurrentState(prev => ({
                     ...prev,
                     mainText: { ...prev.mainText, fade: "opacity-0" }
                 }))
             },
             {
-                timing: 5500,
+                timing: 4500,
+                action: () => setCurrentState(prev => ({
+                    ...prev,
+                    mainText: {
+                        content: "Today is Your Special Day!",
+                        isVisible: true,
+                        fade: "opacity-0"
+                    }
+                }))
+            },
+            {
+                timing: 4600,
+                action: () => setCurrentState(prev => ({
+                    ...prev,
+                    mainText: { ...prev.mainText, fade: "opacity-100" }
+                }))
+            },
+            // Second transition with confetti
+            {
+                timing: 8000,
+                action: () => setCurrentState(prev => ({
+                    ...prev,
+                    mainText: { ...prev.mainText, fade: "opacity-0" }
+                }))
+            },
+            {
+                timing: 8500,
                 action: () => setCurrentState(prev => ({
                     ...prev,
                     mainText: {
@@ -83,24 +109,22 @@ const BirthdayPage = () => {
                 }))
             },
             {
-                timing: 5600,
+                timing: 8600,
                 action: () => setCurrentState(prev => ({
                     ...prev,
-                    mainText: {
-                        ...prev.mainText,
-                        fade: "opacity-100"
-                    }
+                    mainText: { ...prev.mainText, fade: "opacity-100" }
                 }))
             },
+            // First image transition
             {
-                timing: 9000,
+                timing: 12000,
                 action: () => setCurrentState(prev => ({
                     ...prev,
                     mainText: { ...prev.mainText, fade: "opacity-0" }
                 }))
             },
             {
-                timing: 9500,
+                timing: 12500,
                 action: () => setCurrentState(prev => ({
                     ...prev,
                     images: {
@@ -114,68 +138,115 @@ const BirthdayPage = () => {
                 }))
             },
             {
-                timing: 9600,
+                timing: 12600,
                 action: () => setCurrentState(prev => ({
                     ...prev,
                     images: {
                         ...prev.images,
-                        first: {
-                            ...prev.images.first,
-                            fade: "opacity-100"
-                        }
+                        first: { ...prev.images.first, fade: "opacity-100" }
                     },
-                    message: "Happy Birthday!"
+                    message: "Wishing You Joy!"
+                }))
+            },
+            // Second image transition
+            {
+                timing: 16000,
+                action: () => setCurrentState(prev => ({
+                    ...prev,
+                    images: { ...prev.images, first: { ...prev.images.first, fade: "opacity-0" } }
                 }))
             },
             {
-                timing: 12500,
+                timing: 16500,
                 action: () => setCurrentState(prev => ({
                     ...prev,
                     images: {
                         ...prev.images,
-                        first: { ...prev.images.first, fade: "opacity-0" }
-                    }
-                }))
-            },
-            {
-                timing: 13000,
-                action: () => setCurrentState(prev => ({
-                    ...prev,
-                    images: {
                         first: { show: false, fade: "opacity-0", visible: false },
                         second: { show: true, fade: "opacity-0" }
                     }
                 }))
             },
             {
-                timing: 13100,
+                timing: 16600,
                 action: () => setCurrentState(prev => ({
                     ...prev,
-                    images: {
-                        ...prev.images,
-                        second: { ...prev.images.second, fade: "opacity-100" }
-                    },
-                    message: "Celebrate!"
+                    images: { ...prev.images, second: { ...prev.images.second, fade: "opacity-100" } },
+                    message: "May Your Dreams Come True!"
+                }))
+            },
+            // Third image transition
+            {
+                timing: 20000,
+                action: () => setCurrentState(prev => ({
+                    ...prev,
+                    images: { ...prev.images, second: { ...prev.images.second, fade: "opacity-0" } }
                 }))
             },
             {
-                timing: 16000,
+                timing: 20500,
                 action: () => setCurrentState(prev => ({
                     ...prev,
                     images: {
                         ...prev.images,
-                        second: { ...prev.images.second, fade: "opacity-0" }
+                        second: { show: false, fade: "opacity-0" },
+                        third: { show: true, fade: "opacity-0" }
                     }
                 }))
             },
             {
-                timing: 16500,
+                timing: 20600,
+                action: () => setCurrentState(prev => ({
+                    ...prev,
+                    images: { ...prev.images, third: { ...prev.images.third, fade: "opacity-100" } },
+                    message: "Shine Bright!"
+                }))
+            },
+            // Fourth image transition
+            {
+                timing: 24000,
+                action: () => setCurrentState(prev => ({
+                    ...prev,
+                    images: { ...prev.images, third: { ...prev.images.third, fade: "opacity-0" } }
+                }))
+            },
+            {
+                timing: 24500,
+                action: () => setCurrentState(prev => ({
+                    ...prev,
+                    images: {
+                        ...prev.images,
+                        third: { show: false, fade: "opacity-0" },
+                        fourth: { show: true, fade: "opacity-0" }
+                    }
+                }))
+            },
+            {
+                timing: 24600,
+                action: () => setCurrentState(prev => ({
+                    ...prev,
+                    images: { ...prev.images, fourth: { ...prev.images.fourth, fade: "opacity-100" } },
+                    message: "Make a Wish!"
+                }))
+            },
+            // Final message transition
+            {
+                timing: 28000,
+                action: () => setCurrentState(prev => ({
+                    ...prev,
+                    images: { ...prev.images, fourth: { ...prev.images.fourth, fade: "opacity-0" } }
+                }))
+            },
+            {
+                timing: 28500,
                 action: () => {
                     setCurrentState(prev => ({
                         ...prev,
                         images: {
                             first: { show: false, fade: "opacity-0", visible: false },
-                            second: { show: false, fade: "opacity-0" }
+                            second: { show: false, fade: "opacity-0" },
+                            third: { show: false, fade: "opacity-0" },
+                            fourth: { show: false, fade: "opacity-0" }
                         },
                         showTyping: true
                     }));
@@ -190,54 +261,45 @@ const BirthdayPage = () => {
 
         return () => {
             timers.forEach(clearTimeout);
-            audio.pause();
-            audio.currentTime = 0;
+            if (currentState.audio) {
+                currentState.audio.pause();
+                currentState.audio.currentTime = 0;
+            }
         };
-    }, [typeWriter]);
+    }, [typeWriter, initializeAudio]);
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-pink-500 to-yellow-500 relative overflow-hidden">
+        <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 relative overflow-hidden">
             <div className="fixed inset-0 pointer-events-none">
                 {currentState.confetti && <Confetti />}
             </div>
             
-            <div className="relative z-10 flex flex-col items-center justify-center">
+            <div className="relative z-10 flex flex-col items-center justify-center p-4">
                 {currentState.mainText.isVisible && (
                     <div className={`transform transition-all duration-1000 ease-in-out ${currentState.mainText.fade}`}>
-                        <h1 className="text-6xl font-bold text-white text-center">
+                        <h1 className="text-6xl md:text-7xl font-bold text-white text-center">
                             {currentState.mainText.content}
                         </h1>
                     </div>
                 )}
 
-                {currentState.images.first.show && currentState.images.first.visible && (
-                    <div className={`transform transition-all duration-1000 ease-in-out ${currentState.images.first.fade}`}>
-                        <img 
-                            src="/vercel.svg" 
-                            alt="Birthday Celebration" 
-                            className="w-64 h-auto rounded-lg shadow-lg" 
-                        />
-                        <div className="text-2xl text-white mt-4 text-center">
-                            {currentState.message}
+                {Object.entries(currentState.images).map(([key, image]) => (
+                    image.show && (
+                        <div key={key} className={`transform transition-all duration-1000 ease-in-out ${image.fade}`}>
+                            <img 
+                                src={`/vercel.svg`} 
+                                alt={`Birthday Celebration ${key}`} 
+                                className="w-64 md:w-96 h-auto rounded-lg shadow-lg" 
+                            />
+                            <div className="text-2xl md:text-3xl text-white mt-4 text-center font-semibold">
+                                {currentState.message}
+                            </div>
                         </div>
-                    </div>
-                )}
-                
-                {currentState.images.second.show && (
-                    <div className={`transform transition-all duration-1000 ease-in-out ${currentState.images.second.fade}`}>
-                        <img 
-                            src="/next.svg" 
-                            alt="Another Celebration" 
-                            className="w-64 h-auto rounded-lg shadow-lg" 
-                        />
-                        <div className="text-2xl text-white mt-4 text-center">
-                            {currentState.message}
-                        </div>
-                    </div>
-                )}
+                    )
+                ))}
 
                 {currentState.showTyping && (
-                    <div className="max-w-2xl mx-auto p-8 text-white text-2xl leading-relaxed text-center">
+                    <div className="max-w-2xl mx-auto p-8 text-white text-2xl md:text-3xl leading-relaxed text-center">
                         {currentState.typedText}
                         <span className="animate-pulse">|</span>
                     </div>
